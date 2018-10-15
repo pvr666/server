@@ -139,4 +139,116 @@ describe('OC.Share.ShareDialogLinkShareView', function () {
 
 	});
 
+	describe('protect password by Talk', function () {
+
+		var $passwordByTalkCheckbox;
+		var $workingIcon;
+
+		beforeEach(function () {
+			// Needed to render the view
+			configModel.isShareWithLinkAllowed.returns(true);
+
+			// "Enable" Talk
+			window.oc_appswebroots['spreed'] = window.oc_webroot + '/apps/files/';
+
+			// Setting the share also triggers the rendering
+			shareModel.set({
+				linkShare: {
+					isLinkShare: true,
+					password: 'password'
+				}
+			});
+
+			$passwordByTalkCheckbox = view.$el.find('.passwordByTalkCheckbox');
+			$workingIcon = $passwordByTalkCheckbox.prev('.icon-loading-small');
+
+			sinon.stub(shareModel, 'saveLinkShare');
+
+			expect($workingIcon.hasClass('hidden')).toBeTruthy();
+		});
+
+		afterEach(function () {
+			shareModel.saveLinkShare.restore();
+		});
+
+		it('is shown if Talk is enabled and there is a password set', function() {
+			expect($passwordByTalkCheckbox.length).toBeTruthy();
+		});
+
+		it('is not shown if Talk is enabled but there is no password set', function() {
+			shareModel.set({
+				linkShare: {
+					isLinkShare: true
+				}
+			});
+
+			$passwordByTalkCheckbox = view.$el.find('.passwordByTalkCheckbox');
+
+			expect($passwordByTalkCheckbox.length).toBeFalsy();
+		});
+
+		it('is not shown if there is a password set but Talk is not enabled', function() {
+			// "Disable" Talk
+			delete window.oc_appswebroots['spreed'];
+
+			// Setting the model again in this case would not trigger the
+			// rendering, as the model would not have changed.
+			view.render();
+
+			$passwordByTalkCheckbox = view.$el.find('.passwordByTalkCheckbox');
+
+			expect($passwordByTalkCheckbox.length).toBeFalsy();
+		});
+
+		it('checkbox is checked when the setting is enabled', function () {
+			shareModel.set({
+				linkShare: {
+					isLinkShare: true,
+					password: 'password',
+					sendPasswordByTalk: true
+				}
+			});
+
+			$passwordByTalkCheckbox = view.$el.find('.passwordByTalkCheckbox');
+
+			expect($passwordByTalkCheckbox.is(':checked')).toEqual(true);
+		});
+
+		it('checkbox is not checked when the setting is disabled', function () {
+			expect($passwordByTalkCheckbox.is(':checked')).toEqual(false);
+		});
+
+		it('enables the setting if clicked when unchecked', function () {
+			// Simulate the click by checking the checkbox and then triggering
+			// the "change" event.
+			$passwordByTalkCheckbox.prop('checked', true);
+			$passwordByTalkCheckbox.change();
+
+			expect($workingIcon.hasClass('hidden')).toBeFalsy();
+			expect(shareModel.saveLinkShare.withArgs({ sendPasswordByTalk: true }).calledOnce).toBeTruthy();
+		});
+
+		it('disables the setting if clicked when checked', function () {
+			shareModel.set({
+				linkShare: {
+					isLinkShare: true,
+					password: 'password',
+					sendPasswordByTalk: true
+				}
+			});
+
+			$passwordByTalkCheckbox = view.$el.find('.passwordByTalkCheckbox');
+			$workingIcon = $passwordByTalkCheckbox.prev('.icon-loading-small');
+
+			// Simulate the click by unchecking the checkbox and then triggering
+			// the "change" event.
+			$passwordByTalkCheckbox.prop('checked', false);
+			$passwordByTalkCheckbox.change();
+
+			expect($workingIcon.hasClass('hidden')).toBeFalsy();
+			expect(shareModel.saveLinkShare.withArgs({ sendPasswordByTalk: false }).calledOnce).toBeTruthy();
+		});
+
+	});
+
 });

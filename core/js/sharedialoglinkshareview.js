@@ -51,6 +51,7 @@
 			'focusout input.linkPassText': 'onPasswordEntered',
 			'keyup input.linkPassText': 'onPasswordKeyUp',
 			'change .showPasswordCheckbox': 'onShowPasswordClick',
+			'change .passwordByTalkCheckbox': 'onPasswordByTalkChange',
 			'change .publicEditingCheckbox': 'onAllowPublicEditingChange',
 			// copy link url
 			'click .linkText': 'onLinkTextClick',
@@ -244,6 +245,20 @@
 			});
 		},
 
+		onPasswordByTalkChange: function() {
+			var $checkbox = this.$('.passwordByTalkCheckbox');
+			$checkbox.siblings('.icon-loading-small').removeClass('hidden').addClass('inlineblock');
+
+			var sendPasswordByTalk = false;
+			if($checkbox.is(':checked')) {
+				sendPasswordByTalk = true;
+			}
+
+			this.model.saveLinkShare({
+				sendPasswordByTalk: sendPasswordByTalk
+			});
+		},
+
 		onAllowPublicEditingChange: function() {
 			var $checkbox = this.$('.publicEditingCheckbox');
 			$checkbox.siblings('.icon-loading-small').removeClass('hidden').addClass('inlineblock');
@@ -401,6 +416,9 @@
 			var passwordPlaceholderInitial = this.configModel.get('enforcePasswordForPublicLink')
 				? PASSWORD_PLACEHOLDER_MESSAGE : PASSWORD_PLACEHOLDER_MESSAGE_OPTIONAL;
 
+			var isTalkEnabled = oc_appswebroots['spreed'] !== undefined;
+			var sendPasswordByTalk = this.model.get('linkShare').sendPasswordByTalk;
+
 			var publicEditable =
 				!this.model.isFolder()
 				&& isLinkShare
@@ -470,6 +488,9 @@
 				passwordPlaceholderInitial: passwordPlaceholderInitial,
 				isPasswordSet: isPasswordSet || isPasswordEnabledByDefault || isPasswordEnforced,
 				showPasswordCheckBox: showPasswordCheckBox,
+				showPasswordByTalkCheckBox: isTalkEnabled && isPasswordSet,
+				passwordByTalkLabel: t('core', 'Password protect by Talk'),
+				isPasswordByTalkSet: sendPasswordByTalk,
 				publicUpload: publicUpload && isLinkShare,
 				publicEditing: publicEditable,
 				publicEditingChecked: publicEditingChecked,

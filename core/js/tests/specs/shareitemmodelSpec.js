@@ -168,7 +168,8 @@ describe('OC.Share.ShareItemModel', function() {
 					stime: 1403884258,
 					storage: 1,
 					token: 'tehtoken',
-					uid_owner: 'root'
+					uid_owner: 'root',
+					send_password_by_talk: true
 				}
 			]));
 
@@ -186,6 +187,7 @@ describe('OC.Share.ShareItemModel', function() {
 
 			var linkShare = model.get('linkShare');
 			expect(linkShare.isLinkShare).toEqual(true);
+			expect(linkShare.sendPasswordByTalk).toEqual(true);
 
 			// TODO: check more attributes
 		});
@@ -289,7 +291,8 @@ describe('OC.Share.ShareItemModel', function() {
 					stime: 1403884258,
 					storage: 1,
 					token: 'tehtoken',
-					uid_owner: 'root'
+					uid_owner: 'root',
+					send_password_by_talk: false
 				}, {
 					displayname_owner: 'root',
 					expiration: '2015-10-15 00:00:00',
@@ -307,7 +310,8 @@ describe('OC.Share.ShareItemModel', function() {
 					stime: 1403884509,
 					storage: 1,
 					token: 'anothertoken',
-					uid_owner: 'root'
+					uid_owner: 'root',
+					send_password_by_talk: true
 				}]
 			));
 			OC.currentUser = 'root';
@@ -320,6 +324,7 @@ describe('OC.Share.ShareItemModel', function() {
 			var linkShare = model.get('linkShare');
 			expect(linkShare.isLinkShare).toEqual(true);
 			expect(linkShare.token).toEqual('tehtoken');
+			expect(linkShare.sendPasswordByTalk).toEqual(false);
 
 			// TODO: check child too
 		});
@@ -581,6 +586,7 @@ describe('OC.Share.ShareItemModel', function() {
 			expect(addShareStub.firstCall.args[0]).toEqual({
 				password: '',
 				passwordChanged: false,
+				sendPasswordByTalk: false,
 				permissions: OC.PERMISSION_READ,
 				expireDate: '',
 				shareType: OC.Share.SHARE_TYPE_LINK
@@ -605,6 +611,7 @@ describe('OC.Share.ShareItemModel', function() {
 			expect(addShareStub.firstCall.args[0]).toEqual({
 				password: '',
 				passwordChanged: false,
+				sendPasswordByTalk: false,
 				permissions: OC.PERMISSION_READ,
 			expireDate: '2015-07-24 00:00:00',
 			shareType: OC.Share.SHARE_TYPE_LINK

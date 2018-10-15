@@ -19,6 +19,7 @@
 	 * @property {bool} isLinkShare
 	 * @property {string} token
 	 * @property {string|null} password
+	 * @property {bool} sendPasswordByTalk
 	 * @property {string} link
 	 * @property {number} permissions
 	 * @property {Date} expiration
@@ -138,6 +139,7 @@
 				attributes = _.defaults(attributes, {
 					password: '',
 					passwordChanged: false,
+					sendPasswordByTalk: false,
 					permissions: OC.PERMISSION_READ,
 					expireDate: this.configModel.getDefaultExpirationDateString(),
 					shareType: OC.Share.SHARE_TYPE_LINK
@@ -867,6 +869,7 @@
 							id: share.id,
 							token: share.token,
 							password: share.share_with,
+							sendPasswordByTalk: share.send_password_by_talk,
 							link: link,
 							permissions: share.permissions,
 							// currently expiration is only effective for link shares.
